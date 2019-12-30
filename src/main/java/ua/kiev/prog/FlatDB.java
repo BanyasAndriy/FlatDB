@@ -27,14 +27,45 @@ private FlatDB(){};
 
 
 
+ public void AddFlatToBD(Scanner scanner){
+  try { String district;
+   String address;
+   String square;
+   int countOfRooms;
+   int price;
+
+   System.out.print("Введіть район : ");
+   district=scanner.next();
+   System.out.print("Введіть адрес");
+   address=scanner.next();
+   System.out.print("Введіть площу : ");
+   square=scanner.next();
+   System.out.print("Введіть кількість кімнат ");
+   countOfRooms=scanner.nextInt();
+   System.out.print("Введіть ціну ");
+   price=scanner.nextInt();
+
+   PreparedStatement pr = conn.prepareStatement("insert into information (District, address, square, countOfRooms, price)  values (?,?,?,?,?)");
+
+  pr.setString(1,district);
+   pr.setString(2,address);
+   pr.setString(3,square);
+   pr.setInt(4,countOfRooms);
+   pr.setInt(5,price);
+   pr.executeUpdate();
+
+  } catch (SQLException e) {
+   e.printStackTrace();
+  }
+
+ }
+
  public void getDataOfTable() {
 
   try (PreparedStatement pr = conn.prepareStatement("SELECT * FROM information");) {
 
    ResultSet resultSet = pr.executeQuery();
-if (resultSet.next()==false){
- return;
-}
+
    ResultSetMetaData md = pr.getMetaData();
 
    for (int i = 1; i <= md.getColumnCount(); i++) {
@@ -49,8 +80,6 @@ if (resultSet.next()==false){
     System.out.println();
 
    }
-
-
   } catch (SQLException e) {
    e.printStackTrace();
   }
@@ -58,57 +87,37 @@ if (resultSet.next()==false){
  }
 
 
+ public String createSqlQuery(){
 
- public void findElementByParametr(Scanner scan){
+  Scanner scan = new Scanner(System.in);
   int entered;
   String parametr="";
   String valueOfParametr ;
 
-  System.out.println("Виберіть номер параметра по якому буде проходити пошук:\n1 - District\n" +
+  System.out.println("Виберіть параметр по якому буде проходити пошук:(Доступні параметри)\n1 - District\n" +
           "2 - Address\n3 - Square\n4 - countOfRooms\n5 - Price" );
 
-  entered=scan.nextInt();
-
-  switch (entered){
-   case 1 : {
-    parametr="District";
-   break;
-   }
-   case 2 :{
-   parametr="address";
-   break;
-   }
-   case 3 : {
-    parametr="square";
-    break;
-   }
-   case 4 : {
-    parametr="countOfRooms";
-    break;
-   }
-   case 5 : {
-    parametr="price";
-    break;
-   }
-  }
-
-
+  parametr=scan.next();
 
   System.out.println("Введіть значення заданого параметру " +parametr);
 
+  valueOfParametr=scan.next();
 
-  valueOfParametr=scan.nextLine();
-  valueOfParametr=scan.nextLine();
 
   String query="Select * From information where "+parametr+"='"+valueOfParametr+"'";
 
+  return query;
+
+ }
+
+
+
+ public void findElementByQuery(){
+  String query = createSqlQuery();
 
   try (PreparedStatement pr = conn.prepareStatement(query)) {
 
    ResultSet result = pr.executeQuery();
-
-
-
    ResultSetMetaData md = pr.getMetaData();
 int iterator=0;
    while (result.next()) {
@@ -117,21 +126,15 @@ int iterator=0;
      System.out.print(result.getString(i) + "\t\t");
     }
     System.out.println();
-
    }
-   System.out.println("count iter = " + iterator);
 if(iterator==0){
  System.out.println("Введеного значення параметру немає у бд!!!");
 }
-
   } catch (SQLException e) {
    e.printStackTrace();
   }
 
 
  }
-
-
-
 
  }
